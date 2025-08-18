@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "*.sct": "arm",
+        "README": "markdown",
+        "mcuboot.h": "c",
+        "YoroOTA_Uart.h": "c",
+        "returncodesc.h": "c",
+        "returncodesc_en.h": "c",
+        "returncodesc_zh_cn.h": "c",
+        "bootport.h": "c",
+        "bootconfig.h": "c",
+        "yoroota.h": "c",
+        "yoroota_def.h": "c",
+        "stdint.h": "c",
+        "stdbool.h": "c",
+        "yoroota_event.h": "c"
+    }
+}
