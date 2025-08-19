@@ -1,8 +1,8 @@
 /**
  * YoroOTA_Event.h
  *
- *  Created on: 2024年3月13日
- *      Author: skonda15
+ *  Created on: 2025年8月19日
+ *      Author: yono
  *
 */
 /**
@@ -10,8 +10,8 @@
  * 专供bootload程序的简易事件系统
 */
 
-#ifndef _MODULE_EVENT_H_
-#define _MODULE_EVENT_H_
+#ifndef _YORO_OTA_EVENT_H_
+#define _YORO_OTA_EVENT_H_
 
 /* Includes ------------------------------------------------------------------*/
 
@@ -46,4 +46,4 @@ extern void     EventCheck(_EVENT_HANDLE *pd, uint32_t time_ms);
 extern uint32_t EventTrigger(_EVENT_HANDLE *pd, uint32_t event);
 extern uint32_t EventClear(_EVENT_HANDLE *pd, uint32_t event);
 
-#endif /* _MODULE_EVENT_H_ */
+#endif /* _YORO_OTA_EVENT_H_ */

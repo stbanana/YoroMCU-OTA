@@ -13,6 +13,7 @@
         "yoroota_def.h": "c",
         "stdint.h": "c",
         "stdbool.h": "c",
-        "yoroota_event.h": "c"
+        "yoroota_event.h": "c",
+        "yoroota_can.h": "c"
     }
 }

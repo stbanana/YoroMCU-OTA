@@ -1,8 +1,8 @@
 /**
  * YoroOTA_Uart.h
  *
- *  Created on: 2024年3月14日
- *      Author: skonda15
+ *  Created on: 2025年8月19日
+ *      Author: yono
  *
 */
 /**
@@ -10,13 +10,10 @@
  * 使用串口的升级协议流
 */
 
-#ifndef _UART_BOOT_H_
-#define _UART_BOOT_H_
+#ifndef _YORO_OTA_UART_H_
+#define _YORO_OTA_UART_H_
 
 /* Includes ------------------------------------------------------------------*/
-
-#include "BootPort.h"
-#include "ReturnCodesC.h"
 
 #if BOOT_PORT_UART
 /* Exported constants --------------------------------------------------------*/
@@ -56,4 +53,4 @@ extern void UartBootRun(uint16_t msTime);
 
 #endif
 
-#endif /* _UART_BOOT_H_ */
+#endif /* _YORO_OTA_UART_H_ */

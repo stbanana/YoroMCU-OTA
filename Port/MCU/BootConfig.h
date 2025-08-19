@@ -1,8 +1,8 @@
 /**
  * BootConfig.h
  *
- *  Created on: 2024年3月13日
- *      Author: skonda15
+ *  Created on: 2025年8月19日
+ *      Author: yono
  *
 */
 /**
@@ -26,8 +26,17 @@
 /* 定义用户APP可用的结尾地址 超出此地址禁止烧录并回报错误 */
 #define MCUBOOT_APP_END_ADD 0x8010000
 
+/* 定义本机机柜和模块号 
+    正常的应用下可替换为函数或者某个保留变量 */
+/* 模块号 */
+#define PackBOOT_DEVICE_PARA_ID 1
+/* 机柜号 */
+#define PackBOOT_DEVICE_CAB_ID 1
+
 /* 定义本机类型 */
+/* 收件类型 */
 #define PackBOOT_DEVICE_TYPE_RX RX_OBJECT_TYPE2
+/* 发件类型 */
 #define PackBOOT_DEVICE_TYPE_TX TX_OBJECT_TYPE2
 
 /* 物理接口的裁剪，为0则裁剪掉对应接口，以供节省资源 */

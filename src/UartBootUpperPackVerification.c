@@ -1,13 +1,13 @@
 /********************************************************************************
 
 
- **** Copyright (C), 2020, Shenzhen SKONDA ELECTRONIC LTD  ****
-
+ **** Copyright (C), 2024, Yuanlong Xu <Yono233@outlook.com>    ****
+ **** All rights reserved                                       ****
 
  ********************************************************************************
- * File Name     : UartBootUpperPackComlete.c
- * Author        : SKONDA
- * Date          : 2024-03-14
+ * File Name     : UartBootUpperPackVerification.c
+ * Author        : yono
+ * Date          : 2025-08-19
  * Version       : 1.0
 ********************************************************************************/
 /**************************************************************************/

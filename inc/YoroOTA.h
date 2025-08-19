@@ -1,8 +1,8 @@
 /**
  * McuBoot.h
  *
- *  Created on: 2024年3月13日
- *      Author: skonda15
+ *  Created on: 2025年8月19日
+ *      Author: yono
  *
 */
 /**
@@ -17,6 +17,7 @@
 #include "BootPort.h"
 #include "YoroOTA_Def.h"
 #include "YoroOTA_Uart.h"
+#include "YoroOTA_CAN.h"
 #include "YoroOTA_Event.h"
 /* Exported constants --------------------------------------------------------*/
 /* Exported macros -----------------------------------------------------------*/

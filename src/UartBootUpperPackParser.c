@@ -1,13 +1,13 @@
 /********************************************************************************
 
 
- **** Copyright (C), 2020, Shenzhen SKONDA ELECTRONIC LTD  ****
-
+ **** Copyright (C), 2024, Yuanlong Xu <Yono233@outlook.com>    ****
+ **** All rights reserved                                       ****
 
  ********************************************************************************
- * File Name     : UartUartUpperPackParser.c
- * Author        : SKONDA
- * Date          : 2024-03-14
+ * File Name     : UartBootUpperPackParser.c
+ * Author        : yono
+ * Date          : 2025-08-19
  * Version       : 1.0
 ********************************************************************************/
 /**************************************************************************/
@@ -43,6 +43,13 @@ static void UB_KIND_FLASH_RESET_Handle(UART_BOOT_PACK_STRUCT *pack);
 uint32_t UartUpperPackParser(UART_BOOT_PACK_STRUCT *pack)
 {
     UartBootPackSwitchACK(AckReg, YORO_OTA_STATE_ACK); // 运行解析前设置为正确回复包
+
+    if((pack->Msg.bit.bParaID != PackBOOT_DEVICE_PARA_ID && pack->Msg.bit.bParaID != 0) || // 模块ID检查
+       (pack->Msg.bit.bCabID != PackBOOT_DEVICE_CAB_ID && pack->Msg.bit.bCabID != 0)       // 机柜ID检查
+    )
+    {
+        return RETURN_DEFAULT; // 非本机指令，丢弃
+    }
 
     switch(pack->Msg.bit.bKind)
     {
@@ -162,7 +169,7 @@ static void UB_KIND_FLASH_FAT_Handle(UART_BOOT_PACK_STRUCT *pack)
 static void UB_KIND_FLASH_CHEC_Handle(UART_BOOT_PACK_STRUCT *pack)
 {
     McuBootDownStar = (uint32_t)(*(uint32_t *)&pack->Data[0]);
-    McuBootDownSize = (uint32_t)(*(uint32_t *)&pack->Data[4]);
+    McuBootDownSize = (uint16_t)(*(uint16_t *)&pack->Data[6]);
 
     if(McuBootDownStar < MCUBOOT_APP_START_ADD ||                 // 检查起始地址范围
        (McuBootDownStar + McuBootDownSize) > MCUBOOT_APP_END_ADD) // 检查结束地址范围
@@ -188,11 +195,9 @@ static void UB_KIND_FLASH_BURN_Handle(UART_BOOT_PACK_STRUCT *pack)
 {
     if(McuBootDownStar == McuBootAppStar) // 第一包检测
     {
-        /* 暂存最初一个字，完整烧录后再填入 */
-        McuBootFirstFour[0] = pack->Data[0];
-        McuBootFirstFour[1] = pack->Data[1];
-        McuBootFirstFour[2] = pack->Data[2];
-        McuBootFirstFour[3] = pack->Data[3];
+        /* 暂存最初4字，完整烧录后再填入 */
+        for(int i = 0; i < 32; i++)
+            McuBootFirstFour[i] = pack->Data[i];
 
         /* 剔除最初一个字的其他数据，烧录*/
         if(McuBootFlashWrite(McuBootDownStar + 4, (pack->DataLen - 4), &pack->Data[4]) != RETURN_DEFAULT)
@@ -215,7 +220,7 @@ static void UB_KIND_FLASH_BURN_Handle(UART_BOOT_PACK_STRUCT *pack)
     if((McuBootDownStar + McuBootDownSize) == (McuBootAppStar + McuBootAppSize)) // 最末包检测
     {
         /* 烧录最初的一个字 */
-        if(McuBootFlashWrite(McuBootAppStar, 4, McuBootFirstFour) != RETURN_DEFAULT)
+        if(McuBootFlashWrite(McuBootAppStar, 32, McuBootFirstFour) != RETURN_DEFAULT)
         {
             UartBootPackSwitchACK(AckReg, YORO_OTA_STATE_ERRERASE);
             return;
