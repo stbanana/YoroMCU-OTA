@@ -12,6 +12,10 @@
 
 #ifndef _BOOT_CONFIG_H_
 #define _BOOT_CONFIG_H_
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /* Includes ------------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
@@ -49,4 +53,7 @@
 
 /* Exported functions ---------------------------------------------------------*/
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* _BOOT_CONFIG_H_ */

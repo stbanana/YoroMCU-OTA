@@ -12,6 +12,10 @@
 
 #ifndef _YORO_OTA_CAN_H_
 #define _YORO_OTA_CAN_H_
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /* Includes ------------------------------------------------------------------*/
 
@@ -43,4 +47,7 @@ extern void CANBootRun(uint16_t msTime);
 
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* _YORO_OTA_CAN_H_ */

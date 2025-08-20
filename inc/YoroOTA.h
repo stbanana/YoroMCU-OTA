@@ -12,6 +12,10 @@
 
 #ifndef _YORO_OTA_H_
 #define _YORO_OTA_H_
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /* Includes ------------------------------------------------------------------*/
 #include "BootPort.h"
@@ -31,4 +35,7 @@
 extern void YoroOTAInit(void);
 extern void YoroOTARun(uint16_t msTime);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* _YORO_OTA_H_ */

@@ -12,6 +12,10 @@
 
 #ifndef _YORO_OTA_UART_H_
 #define _YORO_OTA_UART_H_
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /* Includes ------------------------------------------------------------------*/
 
@@ -53,4 +57,7 @@ extern void UartBootRun(uint16_t msTime);
 
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* _YORO_OTA_UART_H_ */

@@ -12,6 +12,10 @@
 
 #ifndef _YORO_OTA_EVENT_H_
 #define _YORO_OTA_EVENT_H_
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /* Includes ------------------------------------------------------------------*/
 
@@ -46,4 +50,7 @@ extern void     EventCheck(_EVENT_HANDLE *pd, uint32_t time_ms);
 extern uint32_t EventTrigger(_EVENT_HANDLE *pd, uint32_t event);
 extern uint32_t EventClear(_EVENT_HANDLE *pd, uint32_t event);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* _YORO_OTA_EVENT_H_ */

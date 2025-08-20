@@ -12,6 +12,10 @@
 
 #ifndef _BOOT_PORT_H_
 #define _BOOT_PORT_H_
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /* Includes ------------------------------------------------------------------*/
 #include "BootConfig.h"
@@ -41,4 +45,7 @@ extern uint32_t McuBootFlashErasure(uint32_t Addr, uint32_t Len);
 extern uint32_t McuBootFlashWrite(uint32_t Addr, uint32_t Len, uint8_t *w_buff);
 extern uint32_t McuBootReset(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* _BOOT_PORT_H_ */

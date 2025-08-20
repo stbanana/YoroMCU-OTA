@@ -12,6 +12,10 @@
 
 #ifndef _YORO_OTA_DEF_H_
 #define _YORO_OTA_DEF_H_
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /* Includes ------------------------------------------------------------------*/
 #include "stdint.h"
@@ -101,4 +105,7 @@ extern uint32_t FlashDownDataLen;      // 当前存储多包数据的长度
 extern uint32_t FlashDownDataChecksum; // 当前存储多包数据的和校验
 /* Exported functions ---------------------------------------------------------*/
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* _YORO_OTA_DEF_H_ */
