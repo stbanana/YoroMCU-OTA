@@ -101,7 +101,7 @@ static void InitUart(void)
     rcu_periph_clock_enable(RCU_USART2);
     /* Uart2参数配置 */
     usart_deinit(USART2);
-    usart_baudrate_set(USART2, const_BR_38400bps);        // 配置波特率
+    usart_baudrate_set(USART2, const_BR_9600bps);         // 配置波特率
     usart_word_length_set(USART2, USART_WL_8BIT);         // 数据位8位
     usart_stop_bit_set(USART2, USART_STB_1BIT);           // 停止位1位
     usart_parity_config(USART2, USART_PM_NONE);           // 无校验位

@@ -123,6 +123,10 @@ uint32_t CANBootPackReply(CAN_BOOT_PACK_STRUCT *pack)
     /*寄件方依据设置决定*/
     pack->Msg.bit.bTX_Mes = PackBOOT_DEVICE_TYPE_TX;
 
+    /*回复机柜和模组号依据设置决定*/
+    pack->Msg.bit.bParaID = PackBOOT_DEVICE_PARA_ID;
+    pack->Msg.bit.bCabID  = PackBOOT_DEVICE_CAB_ID;
+
     /* 调整回复状态码 */
     pack->Data[CAN_BOOT_REPLY_DATA_ACK] = AckReg;
 

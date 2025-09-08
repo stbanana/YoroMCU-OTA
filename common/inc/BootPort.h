@@ -18,8 +18,8 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include <stdint.h>
 #include "BootConfig.h"
+#include <stdint.h>
 /* Exported constants --------------------------------------------------------*/
 /* Exported macros -----------------------------------------------------------*/
 

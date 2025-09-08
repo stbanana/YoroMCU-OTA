@@ -24,7 +24,7 @@ void systick_config(void)
     // setup systick timer for 1000Hz interrupts
     //if (SysTick_Config(SystemCoreClock / 10000U))	// 从APP跳进来时这个变量被改变，现改为宏定义
     systick_clksource_set(SYSTICK_CLKSOURCE_HCLK_DIV8);
-    count_1us = (float)72000000 / 8000000;
+    count_1us = (float)120000000 / 12000000;
     count_1ms = (float)count_1us * 1000;
 }
 

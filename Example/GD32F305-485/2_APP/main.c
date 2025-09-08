@@ -20,17 +20,21 @@ uint32_t RunBootTick = 0;
 
 /* 一些符合协议的ping帧 */
 /* 对机柜广播、模块广播、模块类型1的ping帧 */
-const uint8_t PingExtra0[] = {0xFE, 0xEF, 0x05, 0xFA, 0x04, 0x00, 0x00, 0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C, 0xF3};
+const uint8_t PingExtra0[] = {0xFE, 0xEF, 0x00, 0x04, 0xFA, 0x05, 0x08, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF3};
 /* 对机柜广播、模块1、模块类型1的ping帧 */
-const uint8_t PingExtra1[] = {0xFE, 0xEF, 0x05, 0xFA, 0x04, 0x01, 0x00, 0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D, 0xF2};
+const uint8_t PingExtra1[] = {0xFE, 0xEF, 0x01, 0x04, 0xFA, 0x05, 0x08, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF2};
 /* 对机柜1、模块1、模块类型1的ping帧 */
-const uint8_t PingExtra2[] = {0xFE, 0xEF, 0x05, 0xFA, 0x04, 0x41, 0x00, 0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4D, 0xB2};
+const uint8_t PingExtra2[] = {0xFE, 0xEF, 0x41, 0x04, 0xFA, 0x05, 0x08, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xB2};
 
 /* 符合协议的回复帧 */
-const uint8_t PingReply[] = {0xFE, 0xEF, 0x00, 0xFA, 0x80, 0x41, 0x00, 0x08, 0x00, 0x01, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0xCA, 0x35};
+const uint8_t PingReply[] = {0xFE, 0xEF, 0x41, 0x80, 0xFA, 0x00, 0x08, 0x00, 0x00, 0x01, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x35};
 
 /* LED分频 */
 static uint16_t LEDTime = 0;
+
+/* 总线空闲态手动监测 */
+extern int8_t U2IDLE_Delay;
+extern size_t U2RxBufferIndex;
 
 /**
  * @brief 主程序入口
@@ -38,10 +42,14 @@ static uint16_t LEDTime = 0;
 int main(void)
 {
     SysInit( );
+    DFlow_User_Init( );
 
+    /* 切换RS485收发芯片为接收模式 */
+    gpio_bit_write(GPIOB, GPIO_PIN_1, RESET);
     while(1)
     {
         /* ping帧监测 */
+        RxLen = 0;
         while(DFlow_Getc(&DFlow, &RxBuffer[RxLen]) == DFLOW_API_RETURN_DEFAULT)
         {
             RxLen++;
@@ -52,7 +60,10 @@ int main(void)
                    memcmp(RxBuffer, PingExtra2, sizeof(PingExtra2)) == 0)
                 {
                     /* 三种符合规则的ping，触发进入boot */
-                    RunBootTick = 1;
+                    if(RunBootTick == 0)
+                    {
+                        RunBootTick = 1;
+                    }
                     /* 进行回复 */
                     DFlow_Write(&DFlow, (uint8_t *)PingReply, sizeof(PingReply));
                 }
@@ -64,7 +75,7 @@ int main(void)
         if(RunBootTick)
         {
             RunBootTick++;
-            if(RunBootTick >= 1000) // 1秒后进入boot
+            if(RunBootTick >= 500) // 1秒后进入boot
             {
                 /* 关闭中断，清理环境 */
                 InitNVIC( );
@@ -82,6 +93,16 @@ int main(void)
             LEDTime = 0;
         }
 
+        /* 空闲中断处理手动触发 */
+        if(U2IDLE_Delay > 0)
+        {
+            U2IDLE_Delay--;
+            if(U2IDLE_Delay == 0)
+            {
+                DFlow_Interrupt_IDLE_RC_FTF(&DFlow, U2RxBufferIndex);
+                U2RxBufferIndex = 0;
+            }
+        }
         DFlow_Ticks(&DFlow); // 协助485管理
         delay_1ms(1);
     }

@@ -20,9 +20,12 @@
 /* Exported types ------------------------------------------------------------*/
 
 /* Exported variables ---------------------------------------------------------*/
+extern _DFlow DFlow;
 /* Exported functions ---------------------------------------------------------*/
 
-extern void RS485_SendBefor(void);
-extern void RS485_SendOver(void);
+extern void DFlow_User_Init(void);
+
+extern void SendBefor485(void);
+extern void SendOver485(void);
 
 #endif /* _DFLOW_USER_ */

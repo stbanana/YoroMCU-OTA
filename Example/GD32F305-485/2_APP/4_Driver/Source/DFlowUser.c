@@ -17,11 +17,17 @@
 /* Private types -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
-extern uint8_t *U0RxBuffer;
-extern size_t   U0RxBufferIndex;
-extern uint8_t *U0TxBuffer;
-extern size_t   U0TxBufferIndex;
-extern size_t   U0TxBufferLen;
+extern uint8_t *U2RxBuffer;
+extern size_t   U2RxBufferIndex;
+extern uint8_t *U2TxBuffer;
+extern size_t   U2TxBufferIndex;
+extern size_t   U2TxBufferLen;
+
+// 建议4字节对齐，否则 DMA 可能存在问题
+#define T_LEN_MAX 256
+#define R_LEN_MAX 256
+/* 预分配内存区 */
+uint8_t MEM[T_LEN_MAX * 2 + R_LEN_MAX * 2];
 /* Private Constants ---------------------------------------------------------*/
 /* Private macros ------------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
@@ -40,14 +46,22 @@ _DFLOW_COMMON_FUNCTION DFlowFunc = {.Transmit         = Transmit485, //
                                     .SendOver         = SendOver485};
 
 /**
+ * @brief 用户使用DataFlow初始化函数
+ */
+void DFlow_User_Init(void)
+{
+    DFlow_Init(&DFlow, MEM, T_LEN_MAX, R_LEN_MAX, &DFlowFunc);
+}
+
+/**
  * @brief 供Dataflow绑定的发送通道
  * 
  */
 uint32_t Transmit485(volatile void *Data, size_t Len)
 {
-    U0TxBuffer    = (uint8_t *)Data;
-    U0TxBufferLen = Len;
-    usart_interrupt_enable(USART0, USART_INT_TBE);
+    U2TxBuffer    = (uint8_t *)Data;
+    U2TxBufferLen = Len;
+    usart_interrupt_enable(USART2, USART_INT_TBE);
 
     return DFLOW_PORT_RETURN_DEFAULT;
 }
@@ -58,8 +72,8 @@ uint32_t Transmit485(volatile void *Data, size_t Len)
  */
 uint32_t Receive485(volatile void *Data, size_t Len)
 {
-    U0RxBuffer      = (uint8_t *)Data;
-    U0RxBufferIndex = 0;
+    U2RxBuffer      = (uint8_t *)Data;
+    U2RxBufferIndex = 0;
 
     return DFLOW_PORT_RETURN_DEFAULT;
 }
@@ -70,7 +84,7 @@ uint32_t Receive485(volatile void *Data, size_t Len)
  */
 uint32_t TransmitGetState485(void)
 {
-    if(U0TxBufferLen != 0)
+    if(U2TxBufferLen != 0)
         return DFLOW_PORT_RETURNT_ERR_INDEFINITE;
 
     return DFLOW_PORT_RETURN_DEFAULT;
@@ -83,7 +97,7 @@ uint32_t TransmitGetState485(void)
 void SendBefor485(void)
 {
     /* 切换RS485收发芯片为发送模式 */
-    gpio_bit_write(GPIOB, GPIO_PIN_1, RESET);
+    gpio_bit_write(GPIOB, GPIO_PIN_1, SET);
 }
 
 /**
@@ -93,5 +107,5 @@ void SendBefor485(void)
 void SendOver485(void)
 {
     /* 切换RS485收发芯片为接收模式 */
-    gpio_bit_write(GPIOB, GPIO_PIN_1, SET);
+    gpio_bit_write(GPIOB, GPIO_PIN_1, RESET);
 }

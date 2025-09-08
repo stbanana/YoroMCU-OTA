@@ -21,7 +21,7 @@ extern "C"
 
 /* Exported constants --------------------------------------------------------*/
 /* Exported macros -----------------------------------------------------------*/
-#define EVENT_MCU_RESET (2 << 0)
+#define EVENT_MCU_RESET (1 << 1)
 /* Exported types ------------------------------------------------------------*/
 
 typedef struct

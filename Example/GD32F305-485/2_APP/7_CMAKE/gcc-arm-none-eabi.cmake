@@ -40,7 +40,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-sign-compare") # 忽略有符号与无�
 
 # 根据构建类型设置不同的优化级别
 if(CMAKE_BUILD_TYPE MATCHES Debug)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O1 -g3")    # 如果是Debug构建类型，设置为无优化并生成调试信息
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g3")    # 如果是Debug构建类型，设置为无优化并生成调试信息
 endif()
 if(CMAKE_BUILD_TYPE MATCHES Release)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -g1")    # 如果是Release构建类型，设置为O3优化并生成少量调试信息

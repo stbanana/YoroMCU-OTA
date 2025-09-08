@@ -14,6 +14,6 @@
 include(${CMAKE_CURRENT_LIST_DIR}/cmake_func/functions.cmake)
 
 # set_compile_flags_for_matching_files(${CMAKE_PROJECT_NAME} "6_Rtos|7_Exlib" "-w")
-# set_compile_flags_for_matching_files(user_src "6_Rtos|7_Exlib" "-w")
-# set_compile_flags_for_matching_files(user_src "5_PhysicalChip/Drivers" "-O0")
-# set_compile_flags_for_matching_files(user_src "ScpiLib" "-O0")
+set_compile_flags_for_matching_files(user_src "DFlowUser.c" "-O0")
+# set_compile_flags_for_matching_files(user_src "5_PhysicalChip" "-O1 -g0")
+# set_compile_flags_for_matching_files(user_src "1_App" "-O1 -g0")

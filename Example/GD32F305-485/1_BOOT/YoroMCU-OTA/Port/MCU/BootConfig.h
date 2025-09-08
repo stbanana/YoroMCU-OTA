@@ -39,9 +39,9 @@ extern "C"
 
 /* 定义本机类型 */
 /* 收件类型 */
-#define PackBOOT_DEVICE_TYPE_RX RX_OBJECT_TYPE2
+#define PackBOOT_DEVICE_TYPE_RX RX_OBJECT_TYPE1
 /* 发件类型 */
-#define PackBOOT_DEVICE_TYPE_TX TX_OBJECT_TYPE2
+#define PackBOOT_DEVICE_TYPE_TX TX_OBJECT_TYPE1
 
 /* 物理接口的裁剪，为0则裁剪掉对应接口，以供节省资源 */
 #define BOOT_PORT_UART 1 // 使用UART接口

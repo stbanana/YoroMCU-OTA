@@ -204,7 +204,7 @@ static void UB_KIND_FLASH_BURN_Handle(UART_BOOT_PACK_STRUCT *pack)
             McuBootFirstFour[i] = pack->Data[i];
 
         /* 剔除最初一个字的其他数据，烧录*/
-        if(McuBootFlashWrite(McuBootDownStar + 4, (pack->DataLen - 4), &pack->Data[4]) != RETURN_DEFAULT)
+        if(McuBootFlashWrite(McuBootDownStar + 32, (pack->DataLen - 32), &pack->Data[32]) != RETURN_DEFAULT)
         {
             UartBootPackSwitchACK(AckReg, YORO_OTA_STATE_ERRERASE);
             return;

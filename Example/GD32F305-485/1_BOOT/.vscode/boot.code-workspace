@@ -33,7 +33,8 @@
         "C_Cpp.doxygen.generatedStyle": "/**",
         "cmake.configureEnvironment": {
             "PROGRAM_NAME": "AgeDCACGD310_B"
-        }
+        },
+        "cortex-debug.variableUseNaturalFormat": false
     },
     "launch": {
         "version": "0.2.0",
