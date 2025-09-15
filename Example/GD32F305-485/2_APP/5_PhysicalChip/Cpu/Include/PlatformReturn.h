@@ -2,7 +2,7 @@
  * PlatformReturn.h
  *
  *  Created on: 2023年6月29日
- *      Author: skonda15
+ *      Author: yono
 */
 /**
  * 本平台所有函数返回的代码，包括正确操作返回、各种类型的错误

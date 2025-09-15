@@ -42,7 +42,7 @@ static void UB_KIND_FLASH_RESET_Handle(CAN_BOOT_PACK_STRUCT *pack);
  */
 uint32_t CANUpperPackParser(CAN_BOOT_PACK_STRUCT *pack)
 {
-    while(CANBootGetcUpper(&pack->Msg.all, &pack->Data, &pack->DataLen) == RETURN_DEFAULT)
+    while(CANBootGetcUpper(&pack->Msg.all, pack->Data, &pack->DataLen) == RETURN_DEFAULT)
     {
         if((pack->Msg.bit.bParaID != PackBOOT_DEVICE_PARA_ID && pack->Msg.bit.bParaID != 0) || // 模块ID检查
            (pack->Msg.bit.bCabID != PackBOOT_DEVICE_CAB_ID && pack->Msg.bit.bCabID != 0)       // 机柜ID检查
@@ -68,6 +68,8 @@ uint32_t CANUpperPackParser(CAN_BOOT_PACK_STRUCT *pack)
             CANBootPackReply(pack);
             break;
         case KIND_FLASH_FAT:
+            CAN_BOOT_PACK_STRUCT regPack = *pack;
+            CANBootPackReply(&regPack); // 擦除前回复，表明已收到正在耗时擦除
             UB_KIND_FLASH_FAT_Handle(pack);
             CANBootPackReply(pack);
             break;
@@ -147,12 +149,12 @@ static void UB_KIND_FLASH_FAT_Handle(CAN_BOOT_PACK_STRUCT *pack)
     {
         McuBootAppStar        = 0;
         McuBootAppSize        = 0;
-        FlashDownFirstFlag    = 0;
-        FlashDownDataLen      = 0;
-        FlashDownDataChecksum = 0;
         CANBootPackSwitchACK(AckReg, YORO_OTA_STATE_ERRADDRESS);
         return;
     }
+    FlashDownDataLen      = 0;
+    FlashDownDataChecksum = 0;
+    FlashDownFirstFlag    = 1;
 
     if(McuBootFlashErasure(McuBootAppStar, McuBootAppSize) != RETURN_DEFAULT)
     {
@@ -176,10 +178,11 @@ static void UB_KIND_FLASH_CHEC_Handle(CAN_BOOT_PACK_STRUCT *pack)
     {
         McuBootDownStar       = 0;
         McuBootDownSize       = 0;
-        FlashDownDataChecksum = 0;
         CANBootPackSwitchACK(AckReg, YORO_OTA_STATE_ERRADDRESS);
         return;
     }
+    FlashDownDataLen      = 0;
+    FlashDownDataChecksum = 0;
 
     if(McuBootDownSize > 1024) // 单次烧录超越长度检查
     {
@@ -208,6 +211,7 @@ static void UB_KIND_FLASH_BURN_Handle(CAN_BOOT_PACK_STRUCT *pack)
     if(FlashDownFirstFlag == 1) // 起始程序寄存
     {
         FlashDDPushS(pack->Data, 8);
+        FlashDownDataLen -= 8;
         for(int i = 0; i < 8; i++)
         {
             McuBootFirstFour[FlashDownDataLen] = pack->Data[i];
@@ -227,7 +231,7 @@ static void UB_KIND_FLASH_BURN_Handle(CAN_BOOT_PACK_STRUCT *pack)
         FlashDDPushS(pack->Data, pack->DataLen);
     }
 
-    McuBootDownSize -= pack->DataLen;
+    McuBootDownSize -= 8;
     if(McuBootDownSize <= 0) //包已收完，处理
     {
         if(McuDownChecksum != FlashDownDataChecksum) //校验错误，回复错误
@@ -236,12 +240,12 @@ static void UB_KIND_FLASH_BURN_Handle(CAN_BOOT_PACK_STRUCT *pack)
         }
         else
         {
-            if(McuBootFlashWrite(McuBootDownStar, McuBootDownSize, FlashDownData) != RETURN_DEFAULT)
+            if(McuBootFlashWrite(McuBootDownStar, FlashDownDataLen, FlashDownData) != RETURN_DEFAULT)
             {
                 CANBootPackSwitchACK(AckReg, YORO_OTA_STATE_ERRERASE);
             }
             /* 最末包检测 烧录最初寄存 */
-            if((McuBootDownStar + McuBootDownSize) == (McuBootAppStar + McuBootAppSize))
+            if((McuBootDownStar + FlashDownDataLen) >= (McuBootAppStar + McuBootAppSize))
             {
                 /* 烧录最初的一个字 */
                 if(McuBootFlashWrite(McuBootAppStar, 32, McuBootFirstFour) != RETURN_DEFAULT)

@@ -1,0 +1,23 @@
+cmake_minimum_required(VERSION 3.22)
+
+project(YoroMCU-OTA)
+add_library(YoroMCU-OTA INTERFACE) # INTERFACE意味着这个库本身并不会被编译，而是作为依赖被其他目标使用，以便于MBx_user.h可以自己定义并且对库行为进行变更
+
+# 递归查找所有源码文件
+file(GLOB_RECURSE SRC ${CMAKE_CURRENT_LIST_DIR}/src/*.c)
+file(GLOB_RECURSE PROT_SRC ${CMAKE_CURRENT_LIST_DIR}/Port/MCU/*.c)
+
+target_include_directories(YoroMCU-OTA INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/inc
+)
+
+    target_include_directories(YoroMCU-OTA INTERFACE
+        ${CMAKE_CURRENT_LIST_DIR}/Port/MCU        
+	${CMAKE_CURRENT_LIST_DIR}/ReturnCodesC
+    )
+
+target_sources(YoroMCU-OTA INTERFACE
+     ${SRC}
+     ${PROT_SRC}
+)
+

@@ -91,6 +91,10 @@ int main(void)
         {
             gpio_bit_write(GPIOC, GPIO_PIN_4, !gpio_input_bit_get(GPIOC, GPIO_PIN_4));
             LEDTime = 0;
+
+            // usart_data_transmit(USART0, 0XAA);
+            // usart_data_transmit(USART2, 0XAA);
+            // usart_data_transmit(UART3, 0XAA);
         }
 
         /* 空闲中断处理手动触发 */

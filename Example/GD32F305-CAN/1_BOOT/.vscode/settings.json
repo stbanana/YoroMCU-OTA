@@ -1,0 +1,25 @@
+{
+    "files.associations": {
+        "*.sct": "arm",
+        "README": "markdown",
+        "includes.h": "c",
+        "systick.h": "c",
+        "dflowuser.h": "c",
+        "stdint.h": "c",
+        "usartstdio.h": "c",
+        "platformreturn.h": "c",
+        "yoroota.h": "c",
+        "bootconfig.h": "c",
+        "bit": "c",
+        "cmath": "c",
+        "compare": "c",
+        "concepts": "c",
+        "type_traits": "c",
+        "limits": "c",
+        "typeinfo": "c",
+        "bootport.h": "c",
+        "yoroota_event.h": "c",
+        "gd32f3x0.h": "c",
+        "gd32f30x.h": "c"
+    }
+}

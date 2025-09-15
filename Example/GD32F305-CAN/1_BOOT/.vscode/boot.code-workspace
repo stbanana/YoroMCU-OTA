@@ -1,0 +1,80 @@
+{
+    "folders": [
+        {
+            "path": ".."
+        }
+    ],
+    "settings": {
+        "files.associations": {
+            "*.sct": "arm",
+            "*.a51": "a51",
+            "*.h": "c",
+            "*.c": "c",
+            "*.hxx": "cpp",
+            "*.hpp": "cpp",
+            "*.c++": "cpp",
+            "*.cpp": "cpp",
+            "*.cxx": "cpp",
+            "*.cc": "cpp",
+            "array": "c",
+            "string": "c",
+            "string_view": "c",
+            "span": "c",
+            "bitset": "c",
+            "random": "c",
+            "cstddef": "c",
+            "cstdint": "c"
+        },
+        "C_Cpp.formatting": "clangFormat",
+        "C_Cpp.vcFormat.space.betweenEmptyBraces": true,
+        "C_Cpp.vcFormat.space.betweenEmptyLambdaBrackets": true,
+        "C_Cpp.vcFormat.space.betweenEmptyParameterListParentheses": true,
+        "C_Cpp.vcFormat.space.insertAfterSemicolon": true,
+        "C_Cpp.doxygen.generatedStyle": "/**",
+        "cmake.configureEnvironment": {
+            "PROGRAM_NAME": "AgeDCACGD310_B"
+        },
+        "cortex-debug.variableUseNaturalFormat": false
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "cwd": "${workspaceRoot}",
+                "executable": "./build/485_BOOT.elf",
+                "name": "Debug with JLink",
+                "request": "launch",
+                "type": "cortex-debug",
+                // "device": "GD32F310F8",
+                "device": "GD32F305RE",
+                // "runToEntryPoint": "Reset_Handler",
+                "runToEntryPoint": "main",
+                "showDevDebugOutput": "none",
+                "servertype": "jlink",
+                "interface": "swd",
+                // "svdFile": "../5_PhysicalChip/CPU/STM32H743.svd",
+                "liveWatch": {
+                    "enabled": true,
+                    "samplesPerSecond": 4
+                },
+                "rttConfig": {
+                    "enabled": true,
+                    "address": "auto",
+                    "decoders": [
+                        {
+                            "label": "",
+                            "port": 0,
+                            "type": "console"
+                        }
+                    ]
+                },
+            },
+            {
+                "name": "CMake: Script debugging",
+                "type": "cmake",
+                "request": "launch",
+                "cmakeDebugType": "configure"
+            },
+        ]
+    }
+}
