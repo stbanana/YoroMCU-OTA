@@ -11,11 +11,6 @@ target_include_directories(YoroMCU-OTA INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}/inc
 )
 
-    target_include_directories(YoroMCU-OTA INTERFACE
-        ${CMAKE_CURRENT_LIST_DIR}/Port/MCU        
-	${CMAKE_CURRENT_LIST_DIR}/ReturnCodesC
-    )
-
 target_sources(YoroMCU-OTA INTERFACE
      ${SRC}
      ${PROT_SRC}

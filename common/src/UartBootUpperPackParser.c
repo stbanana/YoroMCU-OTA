@@ -135,10 +135,25 @@ uint32_t UartBootPackReply(UART_BOOT_PACK_STRUCT *pack)
     {
         pack->SumNot += pack->Data[i];
     }
-    pack->Data[UART_BOOT_REPLY_DATA_SUMNOT] = ~pack->SumNot;
+    pack->Data[UART_BOOT_REPLY_DATA_SUMNOT] = (~pack->SumNot) & 0xFF;
 
     UartBootWriteUpper((uint8_t *)UartPackHead, 2); // 发送头
+
+#ifdef _YOROOTA_16BIT_BYTE
+    uint8_t data[4];
+    data[0] = (pack->Msg.all) & 0xFF;
+    data[1] = (pack->Msg.all >> 8) & 0xFF;
+    data[2] = (pack->Msg.all >> 16) & 0xFF;
+    data[3] = (pack->Msg.all >> 24) & 0xFF;
+    UartBootWriteUpper((uint8_t *)data, 4);
+    data[0] = (pack->DataLen) & 0xFF;
+    data[1] = (pack->DataLen >> 8) & 0xFF;
+    UartBootWriteUpper((uint8_t *)data, 2);
+    UartBootWriteUpper((uint8_t *)pack->Data, pack->DataLen + 1);
+    return RETURN_DEFAULT;
+#else
     return UartBootWriteUpper((uint8_t *)pack, 7 + UART_BOOT_REPLY_DATA_LEN);
+#endif
 }
 
 /**
@@ -147,8 +162,19 @@ uint32_t UartBootPackReply(UART_BOOT_PACK_STRUCT *pack)
  */
 static void UB_KIND_FLASH_FAT_Handle(UART_BOOT_PACK_STRUCT *pack)
 {
-    McuBootAppStar = (uint32_t)(*(uint32_t *)&pack->Data[0]);
-    McuBootAppSize = (uint32_t)(*(uint32_t *)&pack->Data[4]);
+#ifdef _YOROOTA_16BIT_BYTE
+    McuBootAppStar = ((uint32_t)pack->Data[3] << 24) | //
+                     ((uint32_t)pack->Data[2] << 16) | //
+                     ((uint32_t)pack->Data[1] << 8) |  //
+                     (uint32_t)pack->Data[0];
+    McuBootAppSize = ((uint32_t)pack->Data[7] << 24) | //
+                     ((uint32_t)pack->Data[6] << 16) | //
+                     ((uint32_t)pack->Data[5] << 8) |  //
+                     (uint32_t)pack->Data[4];
+#else
+    McuBootAppStar  = (uint32_t)(*(uint32_t *)&pack->Data[0]);
+    McuBootAppSize  = (uint32_t)(*(uint32_t *)&pack->Data[4]);
+#endif
 
     if(McuBootAppStar != MCUBOOT_APP_START_ADD ||               // 检查起始地址范围
        (McuBootAppStar + McuBootAppSize) > MCUBOOT_APP_END_ADD) // 检查结束地址范围
@@ -172,8 +198,17 @@ static void UB_KIND_FLASH_FAT_Handle(UART_BOOT_PACK_STRUCT *pack)
  */
 static void UB_KIND_FLASH_CHEC_Handle(UART_BOOT_PACK_STRUCT *pack)
 {
+#ifdef _YOROOTA_16BIT_BYTE
+    McuBootDownStar = ((uint32_t)pack->Data[3] << 24) | //
+                      ((uint32_t)pack->Data[2] << 16) | //
+                      ((uint32_t)pack->Data[1] << 8) |  //
+                      (uint32_t)pack->Data[0];
+    McuBootDownSize = ((uint16_t)pack->Data[7] << 8) | //
+                      (uint16_t)pack->Data[6];
+#else
     McuBootDownStar = (uint32_t)(*(uint32_t *)&pack->Data[0]);
     McuBootDownSize = (uint16_t)(*(uint16_t *)&pack->Data[6]);
+#endif
 
     if(McuBootDownStar < MCUBOOT_APP_START_ADD ||                 // 检查起始地址范围
        (McuBootDownStar + McuBootDownSize) > MCUBOOT_APP_END_ADD) // 检查结束地址范围
@@ -200,11 +235,20 @@ static void UB_KIND_FLASH_BURN_Handle(UART_BOOT_PACK_STRUCT *pack)
     if(McuBootDownStar == McuBootAppStar) // 第一包检测
     {
         /* 暂存最初4字，完整烧录后再填入 */
+#ifdef _YOROOTA_16BIT_BYTE
+        for(int i = 0; i < 64; i++)
+#else
         for(int i = 0; i < 32; i++)
+#endif
             McuBootFirstFour[i] = pack->Data[i];
 
-        /* 剔除最初一个字的其他数据，烧录*/
+            /* 剔除最初一个字的其他数据，烧录*/
+#ifdef _YOROOTA_16BIT_BYTE
+        if(McuBootFlashWrite((McuBootDownStar + 16), (pack->DataLen - 32), &pack->Data[32]) != RETURN_DEFAULT)
+#else
         if(McuBootFlashWrite(McuBootDownStar + 32, (pack->DataLen - 32), &pack->Data[32]) != RETURN_DEFAULT)
+#endif
+
         {
             UartBootPackSwitchACK(AckReg, YORO_OTA_STATE_ERRERASE);
             return;
@@ -220,16 +264,6 @@ static void UB_KIND_FLASH_BURN_Handle(UART_BOOT_PACK_STRUCT *pack)
             return;
         }
     }
-
-    if((McuBootDownStar + McuBootDownSize) == (McuBootAppStar + McuBootAppSize)) // 最末包检测
-    {
-        /* 烧录最初的一个字 */
-        if(McuBootFlashWrite(McuBootAppStar, 32, McuBootFirstFour) != RETURN_DEFAULT)
-        {
-            UartBootPackSwitchACK(AckReg, YORO_OTA_STATE_ERRERASE);
-            return;
-        }
-    }
 }
 
 /**
@@ -238,6 +272,12 @@ static void UB_KIND_FLASH_BURN_Handle(UART_BOOT_PACK_STRUCT *pack)
  */
 static void UB_KIND_FLASH_RESET_Handle(UART_BOOT_PACK_STRUCT *pack)
 {
+    /* 烧录最初的一个字 */
+    if(McuBootFlashWrite(McuBootAppStar, 32, McuBootFirstFour) != RETURN_DEFAULT)
+    {
+        UartBootPackSwitchACK(AckReg, YORO_OTA_STATE_ERRERASE);
+        return;
+    }
     /* 自身收到重启包 ，立即进行重启流程*/
     EventTrigger(&tBootEven, EVENT_MCU_RESET);
     return;

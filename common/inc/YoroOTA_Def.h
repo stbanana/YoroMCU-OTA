@@ -19,7 +19,7 @@ extern "C"
 
 /* Includes ------------------------------------------------------------------*/
 // #include "stdbool.h"
-#include "ReturnCodesC.h"
+#include "../ReturnCodesC/ReturnCodesC.h"
 
 /* Exported constants --------------------------------------------------------*/
 /* Exported macros -----------------------------------------------------------*/
@@ -95,7 +95,7 @@ extern uint32_t McuBootDownStar; // 接收到指示信息包，接下来数据�
 extern int32_t  McuBootDownSize; // 接收到指示信息包，接下来数据包的总长度
 extern uint32_t McuDownChecksum; // 接收到指示信息包，接下来数据包的和校验
 /* 最初4字节是起始地址，暂存，延迟写入 */
-extern uint8_t McuBootFirstFour[32];
+extern uint8_t McuBootFirstFour[64];
 
 /* 为多包分帧烧录提供的寄存区 */
 extern uint8_t  FlashDownFirstFlag;    // 是否首包的flag 1则没有首包 0则已有首包

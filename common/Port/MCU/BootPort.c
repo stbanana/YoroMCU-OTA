@@ -28,7 +28,7 @@
  * @param Len 擦除长度
  * @return 标准返回
  */
-uint32_t McuBootFlashErasure(uint32_t Addr, uint32_t Len)
+uint32_t McuBootFlashErasure(volatile uint32_t Addr, volatile uint32_t Len)
 {
     static uint32_t PageNum;
 
@@ -66,7 +66,7 @@ uint32_t McuBootFlashErasure(uint32_t Addr, uint32_t Len)
  * @param w_buff 写入数据地址头
  * @return 标准返回
  */
-uint32_t McuBootFlashWrite(uint32_t Addr, uint32_t Len, uint8_t *w_buff)
+uint32_t McuBootFlashWrite(volatile uint32_t Addr, volatile uint32_t Len, volatile uint8_t *w_buff)
 {
     static uint32_t  OffsetLen; // 记录当前的偏移长度
     static uint32_t *WordData;  // 记录当前写入的字地址
@@ -96,7 +96,7 @@ uint32_t McuBootFlashWrite(uint32_t Addr, uint32_t Len, uint8_t *w_buff)
  */
 uint32_t McuBootReset(void)
 {
-    uint32_t i = 0;
+    volatile uint32_t i = 0;
     /* 少量硬延迟，完成回复包和其他工作 */
     while(i < 0x00CFFFF)
         i++;

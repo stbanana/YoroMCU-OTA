@@ -26,7 +26,7 @@ uint32_t McuBootDownStar; // 接收到指示信息包，接下来数据包的起
 int32_t  McuBootDownSize; // 接收到的指示信息包，接下来数据包的总长度
 uint32_t McuDownChecksum; // 接收到的指示信息包，接下来数据包的和校验
 /* 最初4字，暂存，延迟写入 */
-uint8_t McuBootFirstFour[32];
+uint8_t McuBootFirstFour[64];
 /* 回复通用状态 */
 uint8_t AckReg; // 寄存回复状态码的变量
 

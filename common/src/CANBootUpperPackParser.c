@@ -141,14 +141,25 @@ uint32_t CANBootPackReply(CAN_BOOT_PACK_STRUCT *pack)
  */
 static void UB_KIND_FLASH_FAT_Handle(CAN_BOOT_PACK_STRUCT *pack)
 {
-    McuBootAppStar = (uint32_t)(*(uint32_t *)&pack->Data[0]);
-    McuBootAppSize = (uint32_t)(*(uint32_t *)&pack->Data[4]);
+#ifdef _YOROOTA_16BIT_BYTE
+    McuBootAppStar = ((uint32_t)pack->Data[3] << 24) | //
+                     ((uint32_t)pack->Data[2] << 16) | //
+                     ((uint32_t)pack->Data[1] << 8) |  //
+                     (uint32_t)pack->Data[0];
+    McuBootAppSize = ((uint32_t)pack->Data[7] << 24) | //
+                     ((uint32_t)pack->Data[6] << 16) | //
+                     ((uint32_t)pack->Data[5] << 8) |  //
+                     (uint32_t)pack->Data[4];
+#else
+    McuBootAppStar  = (uint32_t)(*(uint32_t *)&pack->Data[0]);
+    McuBootAppSize  = (uint32_t)(*(uint32_t *)&pack->Data[4]);
+#endif
 
     if(McuBootAppStar != MCUBOOT_APP_START_ADD ||               // 检查起始地址范围
        (McuBootAppStar + McuBootAppSize) > MCUBOOT_APP_END_ADD) // 检查结束地址范围
     {
-        McuBootAppStar        = 0;
-        McuBootAppSize        = 0;
+        McuBootAppStar = 0;
+        McuBootAppSize = 0;
         CANBootPackSwitchACK(AckReg, YORO_OTA_STATE_ERRADDRESS);
         return;
     }
@@ -169,15 +180,26 @@ static void UB_KIND_FLASH_FAT_Handle(CAN_BOOT_PACK_STRUCT *pack)
  */
 static void UB_KIND_FLASH_CHEC_Handle(CAN_BOOT_PACK_STRUCT *pack)
 {
+#ifdef _YOROOTA_16BIT_BYTE
+    McuBootDownStar = ((uint32_t)pack->Data[3] << 24) | //
+                      ((uint32_t)pack->Data[2] << 16) | //
+                      ((uint32_t)pack->Data[1] << 8) |  //
+                      (uint32_t)pack->Data[0];
+    McuDownChecksum = ((uint16_t)pack->Data[5] << 8) | //
+                      (uint16_t)pack->Data[4];
+    McuBootDownSize = ((uint16_t)pack->Data[7] << 8) | //
+                      (uint16_t)pack->Data[6];
+#else
     McuBootDownStar = (uint32_t)(*(uint32_t *)&pack->Data[0]);
     McuDownChecksum = (uint16_t)(*(uint16_t *)&pack->Data[4]);
     McuBootDownSize = (uint16_t)(*(uint16_t *)&pack->Data[6]);
+#endif
 
     if(McuBootDownStar < MCUBOOT_APP_START_ADD ||                 // 检查起始地址范围
        (McuBootDownStar + McuBootDownSize) > MCUBOOT_APP_END_ADD) // 检查结束地址范围
     {
-        McuBootDownStar       = 0;
-        McuBootDownSize       = 0;
+        McuBootDownStar = 0;
+        McuBootDownSize = 0;
         CANBootPackSwitchACK(AckReg, YORO_OTA_STATE_ERRADDRESS);
         return;
     }
@@ -240,15 +262,20 @@ static void UB_KIND_FLASH_BURN_Handle(CAN_BOOT_PACK_STRUCT *pack)
         }
         else
         {
-            if(McuBootFlashWrite(McuBootDownStar, FlashDownDataLen, FlashDownData) != RETURN_DEFAULT)
+            if(McuBootDownStar == McuBootAppStar)
             {
-                CANBootPackSwitchACK(AckReg, YORO_OTA_STATE_ERRERASE);
+#ifdef _YOROOTA_16BIT_BYTE
+                if(McuBootFlashWrite((McuBootDownStar + 16), (FlashDownDataLen - 32), &FlashDownData[32]) != RETURN_DEFAULT)
+#else
+                if(McuBootFlashWrite(McuBootDownStar + 32, (FlashDownDataLen - 32), &FlashDownData[32]) != RETURN_DEFAULT)
+#endif
+                {
+                    CANBootPackSwitchACK(AckReg, YORO_OTA_STATE_ERRERASE);
+                }
             }
-            /* 最末包检测 烧录最初寄存 */
-            if((McuBootDownStar + FlashDownDataLen) >= (McuBootAppStar + McuBootAppSize))
+            else
             {
-                /* 烧录最初的一个字 */
-                if(McuBootFlashWrite(McuBootAppStar, 32, McuBootFirstFour) != RETURN_DEFAULT)
+                if(McuBootFlashWrite(McuBootDownStar, FlashDownDataLen, FlashDownData) != RETURN_DEFAULT)
                 {
                     CANBootPackSwitchACK(AckReg, YORO_OTA_STATE_ERRERASE);
                 }
@@ -267,6 +294,11 @@ static void UB_KIND_FLASH_BURN_Handle(CAN_BOOT_PACK_STRUCT *pack)
  */
 static void UB_KIND_FLASH_RESET_Handle(CAN_BOOT_PACK_STRUCT *pack)
 {
+    /* 烧录最初的一个字 */
+    if(McuBootFlashWrite(McuBootAppStar, 32, McuBootFirstFour) != RETURN_DEFAULT)
+    {
+        CANBootPackSwitchACK(AckReg, YORO_OTA_STATE_ERRERASE);
+    }
     /* 自身收到重启包 ，立即进行重启流程*/
     EventTrigger(&tBootEven, EVENT_MCU_RESET);
     return;

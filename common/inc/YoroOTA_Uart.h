@@ -35,14 +35,14 @@ extern "C"
 /* 回复参数中ACK数据的字节 */
 #define UART_BOOT_REPLY_DATA_ACK 3
 /* 回复参数中和校验取反数据的字节，校验字节参数内容后一个字节 */
-#define UART_BOOT_REPLY_DATA_SUMNOT (UART_BOOT_REPLY_DATA_LEN + 1)
+#define UART_BOOT_REPLY_DATA_SUMNOT (UART_BOOT_REPLY_DATA_LEN)
 
 /* Exported types ------------------------------------------------------------*/
 typedef struct
 {
     union BOOT_PARSE_MSG Msg;                                   /* 烧录指令 */
     uint16_t             DataLen;                               /* 数据长度 */
-    uint8_t              Data[BOOT_SINGLE_WRITE_SIZE_MAX + 10]; /* 数据实体，表示比最大烧录长度 留有10字节裕量 */
+    uint8_t              Data[BOOT_SINGLE_WRITE_SIZE_MAX + 10]__attribute__((__aligned__)); /* 数据实体，表示比最大烧录长度 留有10字节裕量 */
     uint16_t             DataBufferNum;                         /* 数据写入数据指示 */
     uint8_t              SumNot;                                /* 和校验取反 */
 } UART_BOOT_PACK_STRUCT;

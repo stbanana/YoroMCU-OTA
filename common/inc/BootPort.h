@@ -18,10 +18,22 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "BootConfig.h"
+#include "../Port/MCU/BootConfig.h"
 #include <stdint.h>
 /* Exported constants --------------------------------------------------------*/
 /* Exported macros -----------------------------------------------------------*/
+
+/* DSP 16位字节兼容层 */
+#if defined(__TI_COMPILER_VERSION__) && defined(__TMS320C2000__)
+#define _YOROOTA_16BIT_BYTE
+#endif
+
+#ifdef _YOROOTA_16BIT_BYTE
+#ifndef _UINT8_T_DECLARED
+typedef __uint16_t uint8_t;
+#define _UINT8_T_DECLARED
+#endif
+#endif
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables ---------------------------------------------------------*/
@@ -42,8 +54,8 @@ extern uint32_t CANBootGetcLower(uint32_t *id, uint8_t *data_rx, uint8_t *ui8Len
 #endif
 
 /* 与MCU内部相关的函数接口，依据硬件平台修改对应函数内容 */
-extern uint32_t McuBootFlashErasure(uint32_t Addr, uint32_t Len);
-extern uint32_t McuBootFlashWrite(uint32_t Addr, uint32_t Len, uint8_t *w_buff);
+extern uint32_t McuBootFlashErasure(volatile uint32_t Addr, volatile uint32_t Len);
+extern uint32_t McuBootFlashWrite(volatile uint32_t Addr, volatile uint32_t Len, volatile uint8_t *w_buff);
 extern uint32_t McuBootReset(void);
 
 #ifdef __cplusplus

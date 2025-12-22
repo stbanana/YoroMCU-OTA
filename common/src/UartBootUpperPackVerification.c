@@ -158,7 +158,8 @@ uint32_t UartUpperPackVerification(BOOT_PARSE_STATE_STRUCT *state, UART_BOOT_PAC
 
             /* 比对校验信息 */
         case UART_BOOT_PACKET_TAIL:
-            pack->SumNot = ~pack->SumNot;
+            pack->SumNot &= 0xFF;
+            pack->SumNot = (~pack->SumNot) & 0xFF;
             state->step  = UART_BOOT_PACKET_HEAD1;
             if(pack->SumNot == Data) //判断校验,完整正确包立即返回
                 return RETURN_DEFAULT;
