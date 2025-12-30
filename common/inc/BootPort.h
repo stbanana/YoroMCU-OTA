@@ -30,7 +30,9 @@ extern "C"
 
 #ifdef _YOROOTA_16BIT_BYTE
 #ifndef _UINT8_T_DECLARED
+#ifndef uint8_t
 typedef __uint16_t uint8_t;
+#endif
 #define _UINT8_T_DECLARED
 #endif
 #endif
